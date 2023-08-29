@@ -11,10 +11,10 @@ from time import time
 fake=Faker('it_It')
 
 '''Definizione delle variabili utili'''
-percentage = 10
-persons = 1000
-calls = 1000
-cells = 500
+percentage = 100
+persons = 20000
+calls = 1000000
+cells = 16000
 
 
 persons=int(persons * (percentage/100))
@@ -102,7 +102,6 @@ def calls_generator(num_calls):
                 end_timestamp,
                 end_timestamp - start_timestamp
             ]
-        print(call)
         if len(call):
             calls.append(call)
         
@@ -122,6 +121,7 @@ def write_on_file(filename, list, headers):
 
 
 
+cells_generator(cells)
 people_generator(persons)
 calls_generator(calls)
-#cells_generator(cells)
+
