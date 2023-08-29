@@ -18,10 +18,11 @@ cells = 16000
 
 
 persons=int(persons * (percentage/100))
-calls=int(calls * (percentage/100))
-cells=int(cells * (percentage/100))
+num_calls=int(calls * (percentage/100))
+num_cells=int(cells * (percentage/100))
 
 people = []
+cells = []
 
 #Funzione per la generazione delle persone 
 def people_generator(num_person):
@@ -54,8 +55,8 @@ def people_generator(num_person):
 
 #codice per generae le celle telefoniche 
 def cells_generator(num_cells):
+    global cells
     header=["id","city","state","address"]
-    cells = []
     startid=fake.unique.pyint()
 
     for i in range(num_cells):
@@ -76,37 +77,30 @@ def cells_generator(num_cells):
 def calls_generator(num_calls):
     start_date = datetime(2023,1,1)
     end_date = datetime(2023,1,3)
-    
-    header=["id","calling","called","startdate","enddate","duration"]
     calls = []
+    header=["cell_site", "calling","called","startdate","enddate","duration"]
 
-
-    with open("people.csv", 'r') as file:
-        csv_reader = csv.reader(file)
-        num_rows = sum(1 for row in csv_reader)
     
-    startid=fake.unique.pyint()
-
     for i in range(num_calls):
         call = []
         row1 = random.randint(1, len(people)-1)
         row2 = random.randint(1, len(people)-1)
+        site = cells[random.randint(1, len(cells)-1)][0]
         start_timestamp = fake.unix_time(end_date, start_date)
         end_timestamp = start_timestamp + random.randint(60, 3600)
         
-        call=[
-                startid,
+        call = [
+                site,
                 people[row1][3],
                 people[row2][3],
                 start_timestamp,
                 end_timestamp,
                 end_timestamp - start_timestamp
             ]
+        
         if len(call):
             calls.append(call)
         
-        startid+=1
-
     write_on_file("calls", calls, header)
     
     
@@ -121,7 +115,7 @@ def write_on_file(filename, list, headers):
 
 
 
-cells_generator(cells)
+cells_generator(num_cells)
 people_generator(persons)
-calls_generator(calls)
+calls_generator(num_calls)
 
