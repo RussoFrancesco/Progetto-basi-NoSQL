@@ -24,9 +24,9 @@ calls_coll = db["calls"]
 cells_coll= db["cells"]    
 people_coll=db ["people"]
 
-calls_file = open("calls.csv")
-cells_file = open("cells.csv")
-people_file = open("people.csv")
+calls_file = open("csv/calls.csv")
+cells_file = open("csv/cells.csv")
+people_file = open("csv/people.csv")
 
 
 calls_reader = csv.DictReader(calls_file)

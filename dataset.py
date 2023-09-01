@@ -107,7 +107,7 @@ def calls_generator(num_calls):
 
 
 def write_on_file(filename, list, headers):
-    f =open (filename+".csv",'w')
+    f =open ("csv/"+filename+".csv",'w')
     writer=csv.writer(f)
     writer.writerow(headers)
     writer.writerows(list)
