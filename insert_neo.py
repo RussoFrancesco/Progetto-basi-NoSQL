@@ -47,16 +47,21 @@ def create_nodes_from_csv(people_csv,cells_csv,calls_csv):
         add_relationship(chiamante, "IS_CALLING", node)
         add_relationship(node, "IS_DONE", cella)
 
-#Connessione al database di neo4j
-graph = Graph("neo4j://localhost:7687", name="progetto100")
+
+percentage = [25, 50, 75]
+
+for p in percentage:
+    #Connessione al database di neo4j
+    print(p)
+    graph = Graph("neo4j://localhost:7687", name="progetto"+str(p))
 
 
-#Apertura dei file csv
-people_csv = DictReader(open("csv/people.csv"))
-cells_csv = DictReader(open("csv/cells.csv"))
-calls_csv = DictReader(open("csv/calls.csv"))
+    #Apertura dei file csv
+    people_csv = DictReader(open("csv/people"+str(p)+".csv"))
+    cells_csv = DictReader(open("csv/cells"+str(p)+".csv"))
+    calls_csv = DictReader(open("csv/calls"+str(p)+".csv"))
 
-create_nodes_from_csv(people_csv, cells_csv, calls_csv)
+    create_nodes_from_csv(people_csv, cells_csv, calls_csv)
 
 #creazione relazioni sulla base del file calls.csv
 #il file calls.csv contiene sia relazioni con people.csv e con cells.csv 
