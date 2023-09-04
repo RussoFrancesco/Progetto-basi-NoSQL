@@ -10,22 +10,8 @@ from time import time
 
 fake=Faker('it_It')
 
-'''Definizione delle variabili utili'''
-percentage = 100
-persons = 20000
-calls = 1000000
-cells = 16000
-
-
-persons=int(persons * (percentage/100))
-num_calls=int(calls * (percentage/100))
-num_cells=int(cells * (percentage/100))
-
-people = []
-cells = []
-
 #Funzione per la generazione delle persone 
-def people_generator(num_person):
+def people_generator(num_person, percentage):
     header=["full_name","first_name","last_name","number"]
     global people
 
@@ -46,7 +32,7 @@ def people_generator(num_person):
         person.append(phone)
         people.append(person)
 
-        write_on_file("people", people, header)
+        write_on_file("people", people, header, percentage)
 
 
 
@@ -54,8 +40,8 @@ def people_generator(num_person):
 
 
 #codice per generae le celle telefoniche 
-def cells_generator(num_cells):
-    global cells
+def cells_generator(num_cells, percentage):
+    global cells_list
     header=["id","city","state","address"]
     startid=fake.unique.pyint()
 
@@ -67,14 +53,16 @@ def cells_generator(num_cells):
                     fake.state(),
                     fake.street_name() +", "+ fake.building_number()
         ]
-        cells.append(cell)
+        cells_list.append(cell)
     
-    write_on_file("cells", cells, header)
+    write_on_file("cells", cells_list, header, percentage)
 
         
 
 
-def calls_generator(num_calls):
+def calls_generator(num_calls, percentage):
+    global cells_list
+    global people
     start_date = datetime(2023,1,1)
     end_date = datetime(2023,1,3)
     calls = []
@@ -85,7 +73,7 @@ def calls_generator(num_calls):
         call = []
         row1 = random.randint(1, len(people)-1)
         row2 = random.randint(1, len(people)-1)
-        site = cells[random.randint(1, len(cells)-1)][0]
+        site = cells_list[random.randint(1, len(cells_list)-1)][0]
         start_timestamp = fake.unix_time(end_date, start_date)
         end_timestamp = start_timestamp + random.randint(60, 3600)
         
@@ -101,21 +89,34 @@ def calls_generator(num_calls):
         if len(call):
             calls.append(call)
         
-    write_on_file("calls", calls, header)
+    write_on_file("calls", calls, header, percentage)
     
     
 
 
-def write_on_file(filename, list, headers):
-    f =open ("csv/"+filename+".csv",'w')
+def write_on_file(filename, list, headers, percentage):
+    f =open ("csv/"+filename+str(percentage)+".csv",'w')
     writer=csv.writer(f)
     writer.writerow(headers)
     writer.writerows(list)
     f.flush()
 
+'''Definizione delle variabili utili'''
+percentage = [25, 50, 75]
+persons = 20000
+calls = 1000000
+cells = 16000
 
+for p in percentage:
 
-cells_generator(num_cells)
-people_generator(persons)
-calls_generator(num_calls)
+    num_persons=persons * p // 100
+    num_calls=calls * p // 100
+    num_cells=cells * p // 100
+
+    people = []
+    cells_list = []
+
+    cells_generator(num_cells, p)
+    people_generator(num_persons, p)
+    calls_generator(num_calls, p)
 
