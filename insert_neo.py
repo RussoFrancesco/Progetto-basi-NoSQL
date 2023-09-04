@@ -47,7 +47,7 @@ def create_nodes_from_csv(people_csv,cells_csv,calls_csv):
         add_relationship(node, "IS_DONE", cella)
 
 
-percentage = [25, 50, 75]
+percentage = [25, 50, 75, 100]
 
 for p in percentage:
     #Connessione al database di neo4j

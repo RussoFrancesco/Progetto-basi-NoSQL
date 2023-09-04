@@ -11,7 +11,7 @@ def dictate(reader):
 #ci colleghiamo al container che esegue localmente mongodb 
 client = pymongo.MongoClient("localhost", 27017)
 
-percentage = [25, 50, 75]
+percentage = [25, 50, 75, 100]
 
 for p in percentage:
     db = client["progetto"+str(p)] #creazione db test tramite ogg client 
@@ -26,7 +26,7 @@ for p in percentage:
 
     calls_coll = db["calls"]
     cells_coll= db["cells"]    
-    people_coll=db ["people"]
+    people_coll = db ["people"]
 
     calls_file = open("csv/calls"+str(p)+".csv")
     cells_file = open("csv/cells"+str(p)+".csv")

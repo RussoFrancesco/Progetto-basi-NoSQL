@@ -102,7 +102,7 @@ def write_on_file(filename, list, headers, percentage):
     f.flush()
 
 '''Definizione delle variabili utili'''
-percentage = [25, 50, 75]
+percentage = [25, 50, 75, 100]
 persons = 20000
 calls = 1000000
 cells = 16000
