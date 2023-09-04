@@ -1,6 +1,5 @@
 from py2neo import Graph, Relationship, Node
 from csv import DictReader
-from threading import Thread
 
 def add_relationship(nodo1, type, nodo2):
     relationship = Relationship(nodo1, type, nodo2)
@@ -62,48 +61,3 @@ for p in percentage:
     calls_csv = DictReader(open("csv/calls"+str(p)+".csv"))
 
     create_nodes_from_csv(people_csv, cells_csv, calls_csv)
-
-#creazione relazioni sulla base del file calls.csv
-#il file calls.csv contiene sia relazioni con people.csv e con cells.csv 
-'''
-for row in calls_csv:
-    results = []
-
-    #query da porre al db no4j per risalire ai nodi per poi costruire le relazioni
-    queries =[ "MATCH (c1:call) WHERE \
-    c1.cell_site="+row["cell_site"] +" AND \
-    c1.calling="+row["calling"]+" AND \
-    c1.called="+row["called"] +" AND \
-    c1.enddate="+row["enddate"] +" AND \
-    c1.startdate="+row["startdate"] +" AND \
-    c1.duration=" +row["duration"] +"\
-    RETURN c1 ",
-    
-    "MATCH (p1:person) WHERE \
-    p1.number="+row["calling"]+" \
-    RETURN p1",
-
-    "MATCH (p2:person) WHERE \
-    p2.number="+row["called"]+" \
-    RETURN p2",
-
-    "MATCH (c2:cell) WHERE \
-    c2.id="+row["cell_site"]+" \
-    RETURN c2"
-    ]
-
-    #esecuzione delle query
-    for i in range(len(queries)):
-        results.append(graph.run(queries[i]))
-    
-    #recupero i risultati delle query e le assegno nelle ripsettive variabili
-    #evaluate è usato nelle query con 1 solo risultato per recuperare il nodo associato
-    chiamata = results[0].evaluate()
-    chiamante = results[1].evaluate()
-    chiamato = results[2].evaluate()
-    cella = results[3].evaluate()
-
-    add_relationship(chiamata, "IS_CALLED", chiamato)
-    add_relationship(chiamante, "IS_CALLING", chiamata)
-    add_relationship(chiamata, "IS_DONE", cella)
-    '''
