@@ -1,32 +1,76 @@
 import pymongo
 import time
 import csv
+import numpy as np
+from scipy import stats
 
 def clear_cache(database):
     database.command("planCacheClear", "calls")
     database.command("planCacheClear", "cells")
     database.command("planCacheClear", "people")
 
+def confidence(data):
+    avg = np.mean(data)
+    std_dev = np.std(data)
+    confidence_lvl = 0.95
+
+    n = len(data)
+    margin_error = stats.t.ppf((1 + confidence_lvl) / 2, n - 1) * (std_dev / np.sqrt(n))
+    interval = (avg - margin_error, avg + margin_error)
+    return interval
+
 percentage = [25, 50, 75, 100]
 
-result_csv = open("csv/result.csv", "w", newline='\n')
+result_csv = open("csv/result_mongo.csv", "w", newline='')
 writer_result = csv.writer(result_csv)
+headers = ['Query', 'Dimensione', 'Tempo prima esecuzione', 'Tempo delle 30 esecuzioni','Tempo medio', 'Intervallo di confidenza sup', 'Intervallo di confidenza inf']
+writer_result.writerow(headers)
 
 client = pymongo.MongoClient("localhost", 27017)
 
 start_search = 1672617600
 end_search = 1672703999
 
+dur_search_start = 900
+dur_search_end = 1200
+
 query = [
-            {"$match": {"StartDate": {"$gte": start_search,"$lt": end_search}}},
+            [{"$match": {"StartDate": {"$gte": start_search,"$lt": end_search}}}],
             [
                 {"$match":{"StartDate": {"$gte": start_search,"$lt": end_search}}},
                 {"$lookup":{
-                "from": "people",
-                "localField": "called",
-                "foreignField": "number",
-                "as": "called_details"}}
-            ]
+                            "from": "people",
+                            "localField": "called",
+                            "foreignField": "number",
+                            "as": "called_details"}}
+            ],
+            [
+                {"$match": {"StartDate": {"$gte": start_search,"$lt": end_search}}},
+                {"$lookup":{
+                            "from": "people",
+                            "localField": "called",
+                            "foreignField": "number",
+                            "as": "called_details"}},
+                {"$lookup":{
+                            "from": "cell",
+                            "localField": "cell_site",
+                            "foreignField": "id",
+                            "as": "cell_details"}}
+            ],
+            [
+            {"$match": {"StartDate": {"$gte": start_search,
+                                      "$lt": end_search},
+                        "Duration": {"$gte": dur_search_start,
+                                     "$lt": dur_search_end}}},
+            {"$lookup": {"from": "people",
+                         "localField": "CallingNbr",
+                         "foreignField": "Number",
+                         "as": "Calling"}},
+            {"$lookup": {"from": "cells",
+                         "localField": "CellSite",
+                         "foreignField": "CellSite",
+                         "as": "Cell"}}
+        ]
         ]
 
 
@@ -34,24 +78,30 @@ for j in range(1, len(query)+1):
     for p in percentage:
         database = client["progetto"+str(p)]
         call = database["call"]    #mi connetto ad il singolo db ed alla collezione calls di ognuno di questo 
-        header = ["mongo"+str(p)+"_query"+str(j)]
-        writer_result.writerow(header)    
-        
+        clear_cache(database)
 
-        results= []
-        
-        for i in range(31):
-            print(i)
-            start_time = time.time_ns() #tempo iniziale in nanosecondi per evitare perdite di approssimazione      
-            
-            if (j==1):
-                call.find(query[j-1]) #esecuzione della query 0 con find i  quanto sempre nella stessa collection 
-            else:
-                call.aggregate(query[j-1]) #esecuzione della query con aggregate in quanto comprende un operazione di lookup
+        results= ["Query"+str(j), str(p)+"%"]
 
-            end_time = (time.time_ns() - start_time) / 10000000 #calcolo del tempo di esecuzione in millisecondi (divisione per 1 milione)
-            results.append(end_time)
-        print(results)
+        start_time = time.time()
+        call.aggregate(query[j-1])
+        end_time = (time.time() - start_time) * 1000
+        results.append(end_time)
+
+        data = []
+
+        start30 = time.time()
+        for i in range(30):
+            call.aggregate(query[j-1])
+            data.append(time.time()-start30)
+        end30 = (time.time() - start30) * 1000
+        results.append(end30)
+
+        avg = results[3]/30
+        results.append(avg)
+
+        confidence_lvl = confidence(data)
+        results.append(confidence_lvl[1])
+        results.append(confidence_lvl[0])
+
         writer_result.writerow(results)   
         clear_cache(database)    
-

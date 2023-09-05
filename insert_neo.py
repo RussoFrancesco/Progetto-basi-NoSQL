@@ -54,7 +54,6 @@ percentage = [25, 50, 75, 100]
 
 for p in percentage:
     #Connessione al database di neo4j
-    print(p)
     graph = Graph("neo4j://localhost:7687", name="progetto"+str(p))
 
 
