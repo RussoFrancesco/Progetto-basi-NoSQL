@@ -6,7 +6,8 @@ def add_relationship(nodo1, type, nodo2):
     graph.create(relationship)
 
 def create_nodes_from_csv(people_csv,cells_csv,calls_csv):
-    #Creazione dell'oggetto nodo e dell'inserimento nel database
+    '''Creazione dell'oggetto nodo e dell'inserimento nel database
+        Andiamo ad inserire tutte le persone e le celle anadando a recuperare i dati generati sul file peoples.csv e cells.csv'''
     for row in people_csv:
         node = Node("person", full_name=row["full_name"],first_name=row["first_name"],last_name=row["last_name"],number=int(row["number"]))
         graph.create(node)
@@ -15,6 +16,8 @@ def create_nodes_from_csv(people_csv,cells_csv,calls_csv):
         node = Node("cell", id=int(row["id"]), city=row["city"], state=row["state"],address=row["address"])
         graph.create(node)
 
+    ''' I nodi calls oltre alla creazione saranno utilizzati in quanto, nella forma tabellare del files csv si  hanno 3 campi (foreign keys) 
+        che legano le chiamate al chiamato,al chiamante (entrambi identificati dal numero in people.csv) e la cella (id in cells.csv) '''
     for row in calls_csv:
         node = Node("call", cell_site=int(row["cell_site"]), calling=int(row["calling"]), called=int(row["called"]), startdate=int(row["startdate"]), enddate=int(row["enddate"]), duration=int(row["duration"]))
         graph.create(node)
