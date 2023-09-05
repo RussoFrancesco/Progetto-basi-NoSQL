@@ -10,14 +10,7 @@ def clear_cache(database):
     database.command("planCacheClear", "people")
 
 def confidence(data):
-    avg = np.mean(data)
-    std_dev = np.std(data)
-    confidence_lvl = 0.95
-
-    n = len(data)
-    margin_error = stats.t.ppf((1 + confidence_lvl) / 2, n - 1) * (std_dev / np.sqrt(n))
-    interval = (avg - margin_error, avg + margin_error)
-    return interval
+    return stats.t.interval(alpha=0.95, df = len(data)-1, loc=np.mean(data), scale=stats.sem(data))
 
 percentage = [25, 50, 75, 100]
 
@@ -40,17 +33,17 @@ query = [
                 {"$match":{"StartDate": {"$gte": start_search,"$lt": end_search}}},
                 {"$lookup":{
                             "from": "people",
-                            "localField": "called",
+                            "localField": "calling",
                             "foreignField": "number",
-                            "as": "called_details"}}
+                            "as": "calling_details"}}
             ],
             [
                 {"$match": {"StartDate": {"$gte": start_search,"$lt": end_search}}},
                 {"$lookup":{
                             "from": "people",
-                            "localField": "called",
+                            "localField": "calling",
                             "foreignField": "number",
-                            "as": "called_details"}},
+                            "as": "calling_details"}},
                 {"$lookup":{
                             "from": "cell",
                             "localField": "cell_site",
@@ -63,13 +56,13 @@ query = [
                         "Duration": {"$gte": dur_search_start,
                                      "$lt": dur_search_end}}},
             {"$lookup": {"from": "people",
-                         "localField": "CallingNbr",
+                         "localField": "calling",
                          "foreignField": "Number",
-                         "as": "Calling"}},
+                         "as": "calling_details"}},
             {"$lookup": {"from": "cells",
-                         "localField": "CellSite",
-                         "foreignField": "CellSite",
-                         "as": "Cell"}}
+                         "localField": "cell_site",
+                         "foreignField": "id",
+                         "as": "cell_details"}}
         ]
         ]
 
@@ -92,7 +85,7 @@ for j in range(1, len(query)+1):
         start30 = time.time()
         for i in range(30):
             call.aggregate(query[j-1])
-            data.append(time.time()-start30)
+            data.append((time.time()-start30)*1000)
         end30 = (time.time() - start30) * 1000
         results.append(end30)
 
@@ -100,6 +93,7 @@ for j in range(1, len(query)+1):
         results.append(avg)
 
         confidence_lvl = confidence(data)
+        print(confidence_lvl)
         results.append(confidence_lvl[1])
         results.append(confidence_lvl[0])
 

@@ -37,7 +37,8 @@ writer_result.writerow(headers)
 
 for j in range(1, len(query)+1):
     for p in percentage:
+        results = ["Query"+str(j), "Dimensione"+str(p)]
         graph = Graph("neo4j://localhost:7687", name="progetto"+str(p))
-
+        
         for i in range(30):
             pass
