@@ -17,11 +17,17 @@ client = pymongo.MongoClient("localhost", 27017)
 start_search = 1672617600
 end_search = 1672703999
 
-query = [{"$match": {"StartDate": {"$gte": start_search,
-                                      "$lt": end_search}}},
-
-        {"$match":{}}                              
-                                      ]
+query = [
+            {"$match": {"StartDate": {"$gte": start_search,"$lt": end_search}}},
+            [
+                {"$match":{"StartDate": {"$gte": start_search,"$lt": end_search}}},
+                {"$lookup":{
+                "from": "people",
+                "localField": "called",
+                "foreignField": "number",
+                "as": "called_details"}}
+            ]
+        ]
 
 
 for j in range(1, len(query)+1):
@@ -37,7 +43,12 @@ for j in range(1, len(query)+1):
         for i in range(31):
             print(i)
             start_time = time.time_ns() #tempo iniziale in nanosecondi per evitare perdite di approssimazione      
-            call.find(query[j-1]) #esecuzione della query 
+            
+            if (j==1):
+                call.find(query[j-1]) #esecuzione della query 0 con find i  quanto sempre nella stessa collection 
+            else:
+                call.aggregate(query[j-1]) #esecuzione della query con aggregate in quanto comprende un operazione di lookup
+
             end_time = (time.time_ns() - start_time) / 10000000 #calcolo del tempo di esecuzione in millisecondi (divisione per 1 milione)
             results.append(end_time)
         print(results)
