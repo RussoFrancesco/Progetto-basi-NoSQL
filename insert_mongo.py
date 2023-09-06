@@ -1,11 +1,13 @@
 import pymongo 
 import csv 
 
-def dictate(reader):
-    dictionary = []
-    for row in reader:
-        dictionary.append(row)
-    return dictionary
+def dictate(csv):
+    for k, e in enumerate(csv):
+        for f, i in e.items():
+            if i.isdigit():
+                e[f] = int(i)
+    return csv
+
     
 
 #ci colleghiamo al container che esegue localmente mongodb 
@@ -37,10 +39,10 @@ for p in percentage:
     cells_reader = csv.DictReader(cells_file)
     people_reader = csv.DictReader(people_file)
 
-    calls_list = dictate(calls_reader)
-    cells_list = dictate(cells_reader)
-    people_list = dictate(people_reader)
+    calls_list = dictate(list(calls_reader))
+    cells_list = dictate(list(cells_reader))
+    people_list = dictate(list(people_reader))
 
-    insert_calls = calls_coll.insert_many(calls_list)
     insert_cells = cells_coll.insert_many(cells_list)
     insert_people = people_coll.insert_many(people_list)
+    insert_calls = calls_coll.insert_many(calls_list)

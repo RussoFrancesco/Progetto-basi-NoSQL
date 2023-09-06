@@ -40,25 +40,25 @@ query = [
                                       "$lt": end_search}}}
         ],
 
-        [
-            {"$match": {"startdate": {"$gte": start_search,
-                                      "$lt": end_search}}},
-            {"$lookup": {"from": "people",
-                         "localField": "db.calls.calling",
-                         "foreignField": "db.people.number",
-                         "as": "calling"}}
-        ],
+        [{"$match": {"startdate": {
+                        "$gte": start_search,
+                        "$lt": end_search}}},
+        { "$lookup": {
+                        "from": "people",
+                        "localField": "calling",
+                        "foreignField": "number",
+                        "as": "calling"}}],
 
         [
             {"$match": {"startdate": {"$gte": start_search,
                                       "$lt": end_search}}},
-            {"$lookup": {"from": "db.people",
-                         "localField": "db.calls.calling",
-                         "foreignField": "db.people.number",
+            {"$lookup": {"from": "people",
+                         "localField": "calling",
+                         "foreignField": "number",
                          "as": "calling"}},
-            {"$lookup": {"from": "db.cells",
-                         "localField": "db.calls.cell_site",
-                         "foreignField": "db.cells.id",
+            {"$lookup": {"from": "cells",
+                         "localField": "cell_site",
+                         "foreignField": "id",
                          "as": "cell"}}
         ],
 
@@ -66,13 +66,13 @@ query = [
             {"$match": {"startdate": {"$gte": start_search,
                                       "$lt": end_search},
                         "duration": {"$gte": dur_search}}},
-            {"$lookup": {"from": "db.people",
-                         "localField": "db.calls.calling",
-                         "foreignField": "db.people.number",
+            {"$lookup": {"from": "people",
+                         "localField": "calling",
+                         "foreignField": "number",
                          "as": "calling"}},
-            {"$lookup": {"from": "db.cells",
-                         "localField": "db.calls.cell_site",
-                         "foreignField": "db.cells.id",
+            {"$lookup": {"from": "cells",
+                         "localField": "cell_site",
+                         "foreignField": "id",
                          "as": "cell"}}
         ]
     ]
