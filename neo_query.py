@@ -46,13 +46,12 @@ for j in range(1, len(query)+1):
         results.append(end)
 
         data = []
-        start30 = time.time()
         for i in range(30):
+            start30 = time.time()
             graph.run(query[j-1])
-            end_exec = (time.time() - start30) * 1000
-            data.append(end_exec)
-        end30 = (time.time() - start30) * 1000
-        results.append(end30)
+            end30 = (time.time() - start30) * 1000
+            data.append(end30)
+        results.append(sum(data))
 
         avg = results[3]/30
         results.append(avg)
