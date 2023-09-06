@@ -91,13 +91,13 @@ for j in range(1, len(query)+1):
 
         data = []
 
-        start30 = time.time()
+        data = []
         for i in range(30):
+            start30 = time.time()
             call.aggregate(query[j-1])
-            exec_time = (time.time() - start30)
-            data.append(exec_time)
-        end30 = (time.time() - start30) * 1000
-        results.append(end30)
+            end30 = (time.time() - start30) * 1000
+            data.append(end30)
+        results.append(sum(data))
 
         avg = results[3]/30
         results.append(avg)
