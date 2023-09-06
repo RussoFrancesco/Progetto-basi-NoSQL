@@ -40,5 +40,27 @@ for j in range(1, len(query)+1):
         results = ["Query"+str(j), "Dimensione"+str(p)]
         graph = Graph("neo4j://localhost:7687", name="progetto"+str(p))
         
+        start = time.time()
+        graph.run(query[j-1])
+        end = (time.time() - start) * 1000
+        results.append(end)
+
+        data = []
+        start30 = time.time()
         for i in range(30):
-            pass
+            graph.run(query[j-1])
+            end_exec = (time.time() - start30) * 1000
+            data.append(end_exec)
+        end30 = (time.time() - start30) * 1000
+        results.append(end30)
+
+        avg = results[3]/30
+        results.append(avg)
+
+        confidence_lvl = confidence(data)
+        print(confidence_lvl)
+        results.append(confidence_lvl[1])
+        results.append(confidence_lvl[0])
+
+        writer_result.writerow(results)
+

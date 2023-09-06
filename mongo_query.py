@@ -10,7 +10,16 @@ def clear_cache(database):
     database.command("planCacheClear", "people")
 
 def confidence(data):
-    return stats.t.interval(alpha=0.95, df = len(data)-1, loc=np.mean(data), scale=stats.sem(data))
+    n = len(data)
+    mean = np.mean(data)
+    std_dev = np.std(data, ddof=1)
+
+    margin = (std_dev / np.sqrt(n)) * 1.96
+
+    lower = mean - margin
+    upper = mean + margin
+
+    return (lower, upper)
 
 percentage = [25, 50, 75, 100]
 
@@ -85,7 +94,8 @@ for j in range(1, len(query)+1):
         start30 = time.time()
         for i in range(30):
             call.aggregate(query[j-1])
-            data.append((time.time()-start30)*1000)
+            exec_time = (time.time() - start30)
+            data.append(exec_time)
         end30 = (time.time() - start30) * 1000
         results.append(end30)
 
