@@ -2,7 +2,6 @@ import pymongo
 import time
 import csv
 import numpy as np
-from scipy import stats
 
 def clear_cache(database):
     database.command("planCacheClear", "calls")
@@ -33,47 +32,50 @@ client = pymongo.MongoClient("localhost", 27017)
 start_search = 1672617600
 end_search = 1672703999
 
-dur_search_start = 900
-dur_search_end = 1200
+dur_search = 900
 
 query = [
-            [{"$match": {"StartDate": {"$gte": start_search,"$lt": end_search}}}],
-            [
-                {"$match":{"StartDate": {"$gte": start_search,"$lt": end_search}}},
-                {"$lookup":{
-                            "from": "people",
-                            "localField": "calling",
-                            "foreignField": "number",
-                            "as": "calling_details"}}
-            ],
-            [
-                {"$match": {"StartDate": {"$gte": start_search,"$lt": end_search}}},
-                {"$lookup":{
-                            "from": "people",
-                            "localField": "calling",
-                            "foreignField": "number",
-                            "as": "calling_details"}},
-                {"$lookup":{
-                            "from": "cell",
-                            "localField": "cell_site",
-                            "foreignField": "id",
-                            "as": "cell_details"}}
-            ],
-            [
-            {"$match": {"StartDate": {"$gte": start_search,
-                                      "$lt": end_search},
-                        "Duration": {"$gte": dur_search_start,
-                                     "$lt": dur_search_end}}},
+        [
+            {"$match": {"startdate": {"$gte": start_search,
+                                      "$lt": end_search}}}
+        ],
+
+        [
+            {"$match": {"startdate": {"$gte": start_search,
+                                      "$lt": end_search}}},
             {"$lookup": {"from": "people",
-                         "localField": "calling",
-                         "foreignField": "Number",
-                         "as": "calling_details"}},
-            {"$lookup": {"from": "cells",
-                         "localField": "cell_site",
-                         "foreignField": "id",
-                         "as": "cell_details"}}
+                         "localField": "db.calls.calling",
+                         "foreignField": "db.people.number",
+                         "as": "calling"}}
+        ],
+
+        [
+            {"$match": {"startdate": {"$gte": start_search,
+                                      "$lt": end_search}}},
+            {"$lookup": {"from": "db.people",
+                         "localField": "db.calls.calling",
+                         "foreignField": "db.people.number",
+                         "as": "calling"}},
+            {"$lookup": {"from": "db.cells",
+                         "localField": "db.calls.cell_site",
+                         "foreignField": "db.cells.id",
+                         "as": "cell"}}
+        ],
+
+        [
+            {"$match": {"startdate": {"$gte": start_search,
+                                      "$lt": end_search},
+                        "duration": {"$gte": dur_search}}},
+            {"$lookup": {"from": "db.people",
+                         "localField": "db.calls.calling",
+                         "foreignField": "db.people.number",
+                         "as": "calling"}},
+            {"$lookup": {"from": "db.cells",
+                         "localField": "db.calls.cell_site",
+                         "foreignField": "db.cells.id",
+                         "as": "cell"}}
         ]
-        ]
+    ]
 
 
 for j in range(1, len(query)+1):
@@ -91,7 +93,6 @@ for j in range(1, len(query)+1):
 
         data = []
 
-        data = []
         for i in range(30):
             start30 = time.time()
             call.aggregate(query[j-1])
@@ -109,3 +110,5 @@ for j in range(1, len(query)+1):
 
         writer_result.writerow(results)   
         clear_cache(database)    
+
+

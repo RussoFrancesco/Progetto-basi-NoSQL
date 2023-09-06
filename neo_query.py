@@ -1,7 +1,20 @@
 from py2neo import Graph
 import csv
 import time
-from mongo_query import confidence
+import numpy as np
+
+
+def confidence(data):
+    n = len(data)
+    mean = np.mean(data)
+    std_dev = np.std(data, ddof=1)
+
+    margin = (std_dev / np.sqrt(n)) * 1.96
+
+    lower = mean - margin
+    upper = mean + margin
+
+    return (lower, upper)
 
 
 percentage = [25, 50, 75, 100]
@@ -25,8 +38,7 @@ query = [
        "MATCH (p1:person)-[r1:IS_CALLING]->(c:call)-[r2:IS_DONE]->(ce:cell) \
         WHERE c.startdate >= 1672617600 \
             AND c.startdate < 1672703999 \
-            AND c.duration >= 900   \
-            AND c.duration < 1200 \
+            AND c.duration > 900   \
         RETURN p1, r1, c, r2, ce"
     ]
 
@@ -37,24 +49,27 @@ writer_result.writerow(headers)
 
 for j in range(1, len(query)+1):
     for p in percentage:
-        results = ["Query"+str(j), "Dimensione"+str(p)]
+        results = ["Query"+str(j), str(p)+"%"]
         graph = Graph("neo4j://localhost:7687", name="progetto"+str(p))
         
         start = time.time()
         graph.run(query[j-1])
         end = (time.time() - start) * 1000
         results.append(end)
+        print("prima exe"+" Query"+str(j))
 
         data = []
         for i in range(30):
             start30 = time.time()
-            graph.run(query[j-1])
+            query_res = graph.run(query[j-1])
             end30 = (time.time() - start30) * 1000
             data.append(end30)
         results.append(sum(data))
+        print("30 exe")
 
         avg = results[3]/30
         results.append(avg)
+        print("avg")
 
         confidence_lvl = confidence(data)
         print(confidence_lvl)
@@ -62,4 +77,3 @@ for j in range(1, len(query)+1):
         results.append(confidence_lvl[0])
 
         writer_result.writerow(results)
-
