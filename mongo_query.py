@@ -87,15 +87,16 @@ for j in range(1, len(query)+1):
         results= ["Query"+str(j), str(p)+"%"]
 
         start_time = time.time()
-        call.aggregate(query[j-1])
+        database.command("aggregate", value="calls", pipeline=query[j-1], explain=False)
         end_time = (time.time() - start_time) * 1000
         results.append(end_time)
+
 
         data = []
 
         for i in range(30):
             start30 = time.time()
-            call.aggregate(query[j-1])
+            database.command("aggregate", value="calls", pipeline=query[j-1], explain=False)            
             end30 = (time.time() - start30) * 1000
             data.append(end30)
         results.append(sum(data))
@@ -104,7 +105,7 @@ for j in range(1, len(query)+1):
         results.append(avg)
 
         confidence_lvl = confidence(data)
-        print(confidence_lvl)
+        #print(confidence_lvl)
         results.append(confidence_lvl[1])
         results.append(confidence_lvl[0])
 
