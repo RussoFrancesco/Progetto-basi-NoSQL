@@ -103,9 +103,9 @@ def write_on_file(filename, list, headers, percentage):
 
 '''Definizione delle variabili utili'''
 percentage = [25, 50, 75, 100]
-persons = 20000
-calls = 1000000
-cells = 16000
+persons = 4000
+calls = 200000
+cells = 2000
 
 for p in percentage:
 

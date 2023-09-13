@@ -44,5 +44,6 @@ for p in percentage:
     people_list = dictate(list(people_reader))
 
     insert_cells = cells_coll.insert_many(cells_list)
+    people_coll.create_index("number", unique=True)
     insert_people = people_coll.insert_many(people_list)
     insert_calls = calls_coll.insert_many(calls_list)

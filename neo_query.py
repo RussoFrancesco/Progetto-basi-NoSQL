@@ -25,21 +25,23 @@ query = [
             AND c.startdate < 1672703999   \
         RETURN c",
 
-       "MATCH (p1:person)-[r1:IS_CALLING]->(c:call)  \
-        WHERE c.startdate >= 1672617600 \
-            AND c.startdate < 1672703999   \
-        RETURN p1, r1, c",
+       "MATCH (p:person)-[r1:IS_CALLING]->(c:call) \
+        WHERE c.startdate>=1672617600 AND c.startdate<1672703999 \
+        AND p.first_name='Giovanni'\
+        RETURN p,c,r1",
 
-       "MATCH (p1:person)-[r1:IS_CALLING]->(c:call)-[r2:IS_DONE]->(ce:cell) \
-        WHERE c.startdate >= 1672617600 \
-            AND c.startdate < 1672703999   \
-        RETURN p1, r1, c, r2, ce",
+       "MATCH (p:person)-[r1:IS_CALLING]->(c1:call)-[r2:IS_DONE]->(c2:cell) \
+        WHERE c1.startdate>=1672617600 AND c1.startdate<1672703999 \
+        AND p.first_name='Giovanni' \
+        AND c2.state='Roma' \
+        RETURN p,c1,r1,r2,c2",
 
-       "MATCH (p1:person)-[r1:IS_CALLING]->(c:call)-[r2:IS_DONE]->(ce:cell) \
-        WHERE c.startdate >= 1672617600 \
-            AND c.startdate < 1672703999 \
-            AND c.duration > 900   \
-        RETURN p1, r1, c, r2, ce"
+       "MATCH (p1:person)-[r1:IS_CALLING]->(c1:call)-[r2:IS_DONE]->(c2:cell), (p2:person)<-[r3:IS_CALLED]->(c1) \
+        WHERE c1.startdate>=1672617600 AND c1.startdate<1672703999 \
+        AND \
+        ((p1.first_name='Giovanni' AND  p2.first_name='Cassandra') OR \
+        (p1.first_name='Cassandra' AND  p2.first_name='Giovanni')) \
+        RETURN p1,c1,r1,r2,c2,p2,r3"
     ]
 
 result_csv = open("csv/result_neo.csv", "w", newline='')
