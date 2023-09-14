@@ -27,6 +27,7 @@ query = [
 
        "MATCH (p:person)-[r1:IS_CALLING]->(c:call) \
         WHERE c.startdate>=1672617600 AND c.startdate<1672703999 \
+        AND c.duration>=900 \
         AND p.first_name='Giovanni'\
         RETURN p,c,r1",
 
@@ -61,7 +62,7 @@ for j in range(1, len(query)+1):
         print("prima exe"+" Query"+str(j))
 
         data = []
-        for i in range(30):
+        for i in range(40):
             start30 = time.time()
             query_res = graph.run(query[j-1])
             end30 = (time.time() - start30) * 1000
@@ -69,7 +70,7 @@ for j in range(1, len(query)+1):
         results.append(sum(data))
         print("30 exe")
 
-        avg = results[3]/30
+        avg = results[3]/40
         results.append(avg)
         print("avg")
 
