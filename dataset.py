@@ -7,9 +7,9 @@ from datetime import datetime
 fake=Faker('it_It')
 
 #Funzione per la generazione delle persone 
-def people_generator(num_person, percentage):
-    header=["full_name","first_name","last_name","number"]
-    global people
+def people_generator(num_person):
+    
+    people=[]
 
     for i in range(num_person):
         person = []
@@ -28,7 +28,9 @@ def people_generator(num_person, percentage):
         person.append(phone)
         people.append(person)
 
-        write_on_file("people", people, header, percentage)
+    return people
+
+      
 
 
 
@@ -36,9 +38,9 @@ def people_generator(num_person, percentage):
 
 
 #codice per generae le celle telefoniche 
-def cells_generator(num_cells, percentage):
-    global cells_list
-    header=["id","city","state","address"]
+def cells_generator(num_cells):
+    cells_list= []
+    
     startid=fake.unique.pyint()
 
     for i in range(num_cells):
@@ -50,21 +52,17 @@ def cells_generator(num_cells, percentage):
                     fake.street_name() +", "+ fake.building_number()
         ]
         cells_list.append(cell)
-    
-    write_on_file("cells", cells_list, header, percentage)
+    return cells_list
+
 
         
 
 
-def calls_generator(num_calls, percentage):
-    global cells_list
-    global people
+def calls_generator(num_calls,people,cells_list):
     start_date = datetime(2023,1,1)
     end_date = datetime(2023,1,3)
     calls = []
-    header=["cell_site", "calling","called","startdate","enddate","duration"]
 
-    
     for i in range(num_calls):
         call = []
         row1 = random.randint(1, len(people)-1)
@@ -84,8 +82,9 @@ def calls_generator(num_calls, percentage):
         
         if len(call):
             calls.append(call)
+    return calls
         
-    write_on_file("calls", calls, header, percentage)
+    
     
     
 
@@ -99,20 +98,22 @@ def write_on_file(filename, list, headers, percentage):
 
 '''Definizione delle variabili utili'''
 percentage = [25, 50, 75, 100]
-persons = 4000
+people= 4000
 calls = 200000
 cells = 2000
 
+header_cells=["id","city","state","address"]
+header_people=["full_name","first_name","last_name","number"]
+header_calls=["cell_site", "calling","called","startdate","enddate","duration"]
+
+cells_list=cells_generator(cells)
+people_list=people_generator(people)
+calls_list=calls_generator(calls,people_list,cells_list)
+
 for p in percentage:
-
-    num_persons=persons * p // 100
-    num_calls=calls * p // 100
-    num_cells=cells * p // 100
-
-    people = []
-    cells_list = []
-
-    cells_generator(num_cells, p)
-    people_generator(num_persons, p)
-    calls_generator(num_calls, p)
-
+    num_people=people*p//100
+    num_cells=cells*p//100
+    num_calls=calls*p//100
+    write_on_file("people",people_list[:num_people+1],header_people,p)
+    write_on_file("cells",cells_list[:num_cells+1],header_cells,p)
+    write_on_file("calls",calls_list[:num_calls+1],header_calls,p)
