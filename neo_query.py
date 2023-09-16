@@ -20,10 +20,10 @@ def confidence(data):
 percentage = [25, 50, 75, 100]
 
 query = [
-       "MATCH (c:call)  \
-        WHERE c.startdate >= 1672617600 \
-            AND c.startdate < 1672703999   \
-        RETURN c",
+       "MATCH (p:person)  \
+        WHERE p.first_name='Giovanni' \
+        OR p.last_name='Rossi' \
+        RETURN p",
 
        "MATCH (p:person)-[r1:IS_CALLING]->(c:call) \
         WHERE c.startdate>=1672617600 AND c.startdate<1672703999 \
@@ -53,7 +53,7 @@ writer_result.writerow(headers)
 for j in range(1, len(query)+1):
     for p in percentage:
         results = ["Query"+str(j), str(p)+"%"]
-        graph = Graph("neo4j://localhost:7687", name="progetto"+str(p))
+        graph = Graph("neo4j://127.0.0.1:7687", name="progetto"+str(p))
         
         start = time.time()
         graph.run(query[j-1])

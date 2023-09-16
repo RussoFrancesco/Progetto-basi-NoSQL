@@ -71,7 +71,8 @@ end_search1 = 1672790399
 
 queries = [
         
-        {"state": "Roma"}
+        {"$or": [{"first_name":"Giovanni"}, {"last_name":"Rossi"}]}
+
         ,
 
         [{"$match": {"startdate": {
