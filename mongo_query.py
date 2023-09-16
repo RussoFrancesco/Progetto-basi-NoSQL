@@ -3,11 +3,6 @@ import time
 import csv
 import numpy as np
 
-def clear_cache(database):
-    database.command("planCacheClear", "calls")
-    database.command("planCacheClear", "cells")
-    database.command("planCacheClear", "people")
-
 def confidence(data):
     n = len(data)
     mean = np.mean(data)
@@ -20,6 +15,43 @@ def confidence(data):
 
     return (lower, upper)
 
+def query(coll, results, j):
+    if j == 1:
+        start_time = time.time()
+        coll.find(queries[j-1])
+        end_time = (time.time() - start_time) * 1000
+    else:
+        start_time = time.time()
+        coll.aggregate(queries[j-1])
+        end_time = (time.time() - start_time) * 1000
+    results.append(end_time)
+
+    data = []
+
+    for i in range(40):
+        if j == 1:
+            start30 = time.time()
+            coll.find(queries[j-1])
+            end30 = (time.time() - start30) * 1000
+        else:
+            start30 = time.time()
+            coll.aggregate(queries[j-1])
+            end30 = (time.time() - start30) * 1000
+        data.append(end30)
+    results.append(sum(data))
+
+    avg = results[3]/40
+    results.append(avg)
+    print(results)
+
+    confidence_lvl = confidence(data)
+    #print(confidence_lvl)
+    results.append(confidence_lvl[1])
+    results.append(confidence_lvl[0])
+
+    writer_result.writerow(results)   
+    client.close()
+
 percentage = [25, 50, 75, 100]
 
 result_csv = open("csv/result_mongo.csv", "w", newline='')
@@ -29,19 +61,23 @@ writer_result.writerow(headers)
 
 start_search = 1672617600	
 end_search = 1672703999
-dur_search = 900
+start_dur_search = 900
+end_dur_search = 1200
 
 
-query = [
-        [
-            {"$match": {"startdate": {"$gte": start_search,
-                                      "$lt": end_search}}}
-        ],
+start_search1 = 1672531200
+end_search1 = 1672790399
+
+
+queries = [
+        
+        {"state": "Roma"}
+        ,
 
         [{"$match": {"startdate": {
                         "$gte": start_search,
                         "$lt": end_search},
-                     "duration": {"$gte": dur_search}}},
+                     "duration": {"$gte": start_dur_search}}},
         { "$lookup": {
                         "from": "people",
                         "localField": "calling",
@@ -90,37 +126,15 @@ query = [
     ]
 
 
-for j in range(1, len(query)+1):
+for j in range(1, len(queries)+1):
     for p in percentage:
-        client = pymongo.MongoClient("localhost", 27017)
-        database = client["progetto"+str(p)]
-        call = database["calls"]    #mi connetto ad il singolo db ed alla collezione calls di ognuno di questo 
-
         results = ["Query"+str(j), str(p)+"%"]
-
-        start_time = time.time()
-        call.aggregate(query[j-1])
-        end_time = (time.time() - start_time) * 1000
-        results.append(end_time)
-        print(results)
-
-        data = []
-
-        for i in range(40):
-            start30 = time.time()
-            call.aggregate(query[j-1])        
-            end30 = (time.time() - start30) * 1000
-            data.append(end30)
-        results.append(sum(data))
-
-        avg = results[3]/40
-        results.append(avg)
-
-        confidence_lvl = confidence(data)
-        #print(confidence_lvl)
-        results.append(confidence_lvl[1])
-        results.append(confidence_lvl[0])
-
-        writer_result.writerow(results)   
-        client.close()
+        client = pymongo.MongoClient("127.0.0.1:27017")
+        database = client["progetto"+str(p)]
+        if j == 1:
+            coll = database["cells"]
+        else:
+            coll = database["calls"]    #mi connetto ad il singolo db ed alla collezione calls di ognuno di questo
+        
+        query(coll, results, j)
 

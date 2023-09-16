@@ -1,11 +1,7 @@
 from faker import Faker
 import csv
-import os
 import random
-from datetime import date
 from datetime import datetime
-from threading import Thread
-from time import time
 
 
 fake=Faker('it_It')
