@@ -65,9 +65,9 @@ def calls_generator(num_calls,people,cells_list):
 
     for i in range(num_calls):
         call = []
-        row1 = random.randint(1, len(people)-1)
-        row2 = random.randint(1, len(people)-1)
-        site = cells_list[random.randint(1, len(cells_list)-1)][0]
+        row1 = random.randint(0, len(people)-1)
+        row2 = random.randint(0, len(people)-1)
+        site = cells_list[random.randint(0, len(cells_list)-1)][0]
         start_timestamp = fake.unix_time(end_date, start_date)
         end_timestamp = start_timestamp + random.randint(60, 3600)
         
@@ -108,12 +108,13 @@ header_calls=["cell_site", "calling","called","startdate","enddate","duration"]
 
 cells_list=cells_generator(cells)
 people_list=people_generator(people)
-calls_list=calls_generator(calls,people_list,cells_list)
+
 
 for p in percentage:
     num_people=people*p//100
     num_cells=cells*p//100
     num_calls=calls*p//100
+    calls_list=calls_generator(calls,people_list[:num_people+1],cells_list[:num_cells+1])
     write_on_file("people",people_list[:num_people+1],header_people,p)
     write_on_file("cells",cells_list[:num_cells+1],header_cells,p)
     write_on_file("calls",calls_list[:num_calls+1],header_calls,p)
