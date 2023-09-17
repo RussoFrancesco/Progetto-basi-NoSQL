@@ -3,14 +3,15 @@ import matplotlib.pyplot as plt
 import re
 
 # Carica i dati dai file CSV
-data_mongo = pd.read_csv('csv/result_mongoDEFINITIVO.csv')
-data_neo4j = pd.read_csv('csv/result_neoDEFINITIVO.csv')
+data_mongo = pd.read_csv('csv/result_mongo.csv')
+data_neo4j = pd.read_csv('csv/result_neo.csv')
+
 
 # Lista delle dimensioni del dataset
 dataset_sizes = ['100%', '75%', '50%', '25%']
 
 # Lista delle query
-queries = ['Query 1', 'Query 2', 'Query 3', 'Query 4']
+queries = ['Query1', 'Query2', 'Query3', 'Query4']
 
 # Definisce i colori per MongoDB e Neo4j
 color_mongo = 'red'
@@ -49,8 +50,8 @@ for query in queries:
         values_neo4j = data_neo4j_query[data_neo4j_query['Dimensione'] == size]['Tempo medio']
         
         # Estrae intervalli di confidenza
-        confidence_intervals_mongo = data_mongo_query[data_mongo_query['Dimensione'] == size]['Confidence Interval (95%)']
-        confidence_intervals_neo4j = data_neo4j_query[data_neo4j_query['Dimensione'] == size]['Confidence Interval (95%)']
+        confidence_intervals_mongo = data_mongo_query[data_mongo_query['Dimensione'] == size]['Intervallo di confidenza']
+        confidence_intervals_neo4j = data_neo4j_query[data_neo4j_query['Dimensione'] == size]['Intervallo di confidenza']
         conf_intervals_mongo = [extract_confidence_values(conf_str) for conf_str in confidence_intervals_mongo]
         conf_intervals_neo4j = [extract_confidence_values(conf_str) for conf_str in confidence_intervals_neo4j]
         
@@ -69,7 +70,7 @@ for query in queries:
         plt.bar(f"{size} (Neo4j)", values_neo4j.values[0], yerr=neo4j_yerr, capsize=5, color=color_neo4j, label='Neo4j')
         
     plt.xlabel('Dimensione del Dataset')
-    plt.ylabel('Tempo di esecuzione medio (ms)')
+    plt.ylabel('Tempo di esecuzione medio')
     plt.title(f'Istogramma - Tempo di Esecuzione Medio per {query}')
     plt.legend()
     plt.tight_layout()
