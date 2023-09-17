@@ -50,7 +50,7 @@ def query(coll, results, j):
     results.append(confidence_lvl[0])
 
     writer_result.writerow(results)   
-    client.close()
+    
 
 percentage = [25, 50, 75, 100]
 
@@ -71,20 +71,19 @@ end_search1 = 1672790399
 
 queries = [
         
-        {"first_name":"Antonio","last_name":"Moresi"}
+        {"first_name":"Laura"}
 
         ,
 
         [{"$match": {"startdate": {
                         "$gte": start_search,
-                        "$lt": end_search},
-                     "duration": {"$gte": start_dur_search}}},
+                        "$lt": end_search}}},
         { "$lookup": {
                         "from": "people",
                         "localField": "calling",
                         "foreignField": "number",
                         "as": "calling"}},
-        {"$match":{"calling.first_name":"Giovanni"}}
+        {"$match":{"calling.first_name":"Laura"}}
         ],
 
         [{"$match": {"startdate": {"$gte": start_search,
@@ -97,7 +96,7 @@ queries = [
                          "localField": "cell_site",
                          "foreignField": "id",
                          "as": "cell"}},
-            {"$match": {"calling.first_name": "Giovanni" }},
+            {"$match": {"calling.first_name": "Laura" }},
             {"$match":{"cell.state":"Roma"}}
         ],
 
@@ -117,8 +116,8 @@ queries = [
                          "as": "called"}},
             {"$match": {
                 "$or":[ 
-                {"calling.first_name": "Giovanni","called.first_name": "Cassandra"} ,
-                {"called.first_name": "Giovanni","calling.first_name": "Cassandra"}
+                {"calling.first_name": "Laura","called.first_name": "Antonio"} ,
+                {"called.first_name": "Antonio","calling.first_name": "Laura"}
                 ]
                 }
             }
@@ -138,4 +137,5 @@ for j in range(1, len(queries)+1):
             coll = database["calls"]    #mi connetto ad il singolo db ed alla collezione calls di ognuno di questo
         
         query(coll, results, j)
+        client.close()
 

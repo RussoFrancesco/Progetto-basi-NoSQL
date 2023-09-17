@@ -21,26 +21,25 @@ percentage = [25, 50, 75, 100]
 
 query = [
        "MATCH (p:person)  \
-        WHERE p.first_name='Antonio' AND p.last_name='Moresi' \
+        WHERE p.first_name='Laura'\
         RETURN p",
 
        "MATCH (p:person)-[r1:IS_CALLING]->(c:call) \
         WHERE c.startdate>=1672617600 AND c.startdate<1672703999 \
-        AND c.duration>=900 \
-        AND p.first_name='Giovanni'\
+        AND p.first_name='Laura'\
         RETURN p,c,r1",
 
        "MATCH (p:person)-[r1:IS_CALLING]->(c1:call)-[r2:IS_DONE]->(c2:cell) \
         WHERE c1.startdate>=1672617600 AND c1.startdate<1672703999 \
-        AND p.first_name='Giovanni' \
+        AND p.first_name='Laura' \
         AND c2.state='Roma' \
         RETURN p,c1,r1,r2,c2",
 
        "MATCH (p1:person)-[r1:IS_CALLING]->(c1:call)-[r2:IS_DONE]->(c2:cell), (p2:person)<-[r3:IS_CALLED]->(c1) \
         WHERE c1.startdate>=1672617600 AND c1.startdate<1672703999 \
         AND \
-        ((p1.first_name='Giovanni' AND  p2.first_name='Cassandra') OR \
-        (p1.first_name='Cassandra' AND  p2.first_name='Giovanni')) \
+        ((p1.first_name='Antonio' AND  p2.first_name='Laura') OR \
+        (p1.first_name='Laura' AND  p2.first_name='Laura')) \
         RETURN p1,c1,r1,r2,c2,p2,r3"
     ]
 
