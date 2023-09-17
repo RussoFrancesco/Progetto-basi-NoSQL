@@ -16,27 +16,18 @@ def confidence(data):
     return (lower, upper)
 
 def query(coll, results, j):
-    if j == 1:
-        start_time = time.time()
-        coll.find(queries[j-1])
-        end_time = (time.time() - start_time) * 1000
-    else:
-        start_time = time.time()
-        coll.aggregate(queries[j-1])
-        end_time = (time.time() - start_time) * 1000
+  
+    start_time = time.time()
+    coll.aggregate(queries[j-1])
+    end_time = (time.time() - start_time) * 1000
     results.append(end_time)
 
     data = []
 
     for i in range(40):
-        if j == 1:
-            start30 = time.time()
-            coll.find(queries[j-1])
-            end30 = (time.time() - start30) * 1000
-        else:
-            start30 = time.time()
-            coll.aggregate(queries[j-1])
-            end30 = (time.time() - start30) * 1000
+        start30 = time.time()
+        coll.aggregate(queries[j-1])
+        end30 = (time.time() - start30) * 1000
         data.append(end30)
     results.append(sum(data))
 
@@ -71,7 +62,7 @@ end_search1 = 1672790399
 
 queries = [
         
-        {"first_name":"Laura"}
+        [{"$match":{"first_name":"Laura"}}]
 
         ,
 
