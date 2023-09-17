@@ -21,8 +21,7 @@ percentage = [25, 50, 75, 100]
 
 query = [
        "MATCH (p:person)  \
-        WHERE p.first_name='Giovanni' \
-        OR p.last_name='Rossi' \
+        WHERE p.first_name='Antonio' AND p.last_name='Moresi' \
         RETURN p",
 
        "MATCH (p:person)-[r1:IS_CALLING]->(c:call) \
@@ -53,7 +52,7 @@ writer_result.writerow(headers)
 for j in range(1, len(query)+1):
     for p in percentage:
         results = ["Query"+str(j), str(p)+"%"]
-        graph = Graph("neo4j://127.0.0.1:7687", name="progetto"+str(p))
+        graph = Graph("neo4j://127.0.0.1:7688", name="progetto"+str(p))
         
         start = time.time()
         graph.run(query[j-1])
