@@ -16,19 +16,29 @@ def confidence(data):
     return (lower, upper)
 
 def query(coll, results, j):
-  
-    start_time = time.time()
-    coll.aggregate(queries[j-1])
-    end_time = (time.time() - start_time) * 1000
+    
+    if (j == 1):
+        start_time = time.time()
+        coll.find(queries[j-1])
+        end_time = (time.time() - start_time) * 1000
+    else:
+        start_time = time.time()
+        coll.aggregate(queries[j-1])
+        end_time = (time.time() - start_time) * 1000
     results.append(end_time)
 
     data = []
 
     for i in range(40):
-        start30 = time.time()
-        coll.aggregate(queries[j-1])
-        end30 = (time.time() - start30) * 1000
-        data.append(end30)
+        if (j == 1):
+            start_time40 = time.time()
+            coll.find(queries[j-1])
+            end_time40 = (time.time() - start_time40) * 1000
+        else:
+            start_time40 = time.time()
+            coll.aggregate(queries[j-1])
+            end_time40 = (time.time() - start_time40) * 1000
+        data.append(end_time40)
     results.append(sum(data))
 
     avg = results[3]/40
@@ -37,17 +47,16 @@ def query(coll, results, j):
 
     confidence_lvl = confidence(data)
     #print(confidence_lvl)
-    results.append(confidence_lvl[1])
-    results.append(confidence_lvl[0])
+    results.append(confidence_lvl)
 
     writer_result.writerow(results)   
     
 
 percentage = [25, 50, 75, 100]
 
-result_csv = open("csv/result_mongo.csv", "w", newline='')
+result_csv = open("csv/result_mongociao.csv", "w", newline='')
 writer_result = csv.writer(result_csv)
-headers = ['Query', 'Dimensione', 'Tempo prima esecuzione', 'Tempo delle 30 esecuzioni','Tempo medio', 'Intervallo di confidenza sup', 'Intervallo di confidenza inf']
+headers = ['Query', 'Dimensione', 'Tempo prima esecuzione', 'Tempo delle 40 esecuzioni','Tempo medio', 'Intervallo di confidenza sup', 'Intervallo di confidenza inf']
 writer_result.writerow(headers)
 
 start_search = 1672617600	
@@ -61,8 +70,8 @@ end_search1 = 1672790399
 
 
 queries = [
-        
-        [{"$match":{"first_name":"Laura"}}]
+
+        {"first_name":"Laura"}
 
         ,
 
@@ -123,7 +132,7 @@ for j in range(1, len(queries)+1):
         client = pymongo.MongoClient("127.0.0.1:27017")
         database = client["progetto"+str(p)]
         if j == 1:
-            coll = database["cells"]
+            coll = database["people"]
         else:
             coll = database["calls"]    #mi connetto ad il singolo db ed alla collezione calls di ognuno di questo
         

@@ -45,7 +45,7 @@ query = [
 
 result_csv = open("csv/result_neo.csv", "w", newline='')
 writer_result = csv.writer(result_csv)
-headers = ['Query', 'Dimensione', 'Tempo prima esecuzione', 'Tempo delle 30 esecuzioni','Tempo medio', 'Intervallo di confidenza sup', 'Intervallo di confidenza inf']
+headers = ['Query', 'Dimensione', 'Tempo prima esecuzione', 'Tempo delle 40 esecuzioni','Tempo medio', 'Intervallo di confidenza sup', 'Intervallo di confidenza inf']
 writer_result.writerow(headers)
 
 for j in range(1, len(query)+1):
@@ -74,7 +74,6 @@ for j in range(1, len(query)+1):
 
         confidence_lvl = confidence(data)
         print(confidence_lvl)
-        results.append(confidence_lvl[1])
-        results.append(confidence_lvl[0])
+        results.append(confidence_lvl)
 
         writer_result.writerow(results)
