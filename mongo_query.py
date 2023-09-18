@@ -54,9 +54,9 @@ def query(coll, results, j):
 
 percentage = [25, 50, 75, 100]
 
-result_csv = open("csv/result_mongociao.csv", "w", newline='')
+result_csv = open("csv/result_mongo.csv", "w", newline='')
 writer_result = csv.writer(result_csv)
-headers = ['Query', 'Dimensione', 'Tempo prima esecuzione', 'Tempo delle 40 esecuzioni','Tempo medio', 'Intervallo di confidenza sup', 'Intervallo di confidenza inf']
+headers = ['Query', 'Dimensione', 'Tempo prima esecuzione', 'Tempo delle 40 esecuzioni','Tempo medio', 'Intervallo di confidenza']
 writer_result.writerow(headers)
 
 start_search = 1672617600	
