@@ -37,7 +37,7 @@ def people_generator(num_person):
 
 
 
-#codice per generae le celle telefoniche 
+#funzione per la creazione delle celle
 def cells_generator(num_cells):
     cells_list= []
     
@@ -57,7 +57,7 @@ def cells_generator(num_cells):
 
         
 
-
+#funzione per la creazione delle chiamate
 def calls_generator(num_calls,people,cells_list):
     start_date = datetime(2023,1,1)
     end_date = datetime(2023,1,3)
@@ -88,7 +88,7 @@ def calls_generator(num_calls,people,cells_list):
     
     
 
-
+#funzione per scrivere i dati su file csv
 def write_on_file(filename, list, headers, percentage):
     f =open ("csv/"+filename+str(percentage)+".csv",'w')
     writer=csv.writer(f)
@@ -96,25 +96,33 @@ def write_on_file(filename, list, headers, percentage):
     writer.writerows(list)
     f.flush()
 
-'''Definizione delle variabili utili'''
+
+#Definizione delle variabili utili
 percentage = [25, 50, 75, 100]
 people= 4000
 calls = 200000
 cells = 2000
 
+#definzione headers dei file csv
 header_cells=["id","city","state","address"]
 header_people=["full_name","first_name","last_name","number"]
 header_calls=["cell_site", "calling","called","startdate","enddate","duration"]
 
+#creazione delle celle e delle persone
 cells_list=cells_generator(cells)
 people_list=people_generator(people)
 
 
 for p in percentage:
+    #modifichiamo il numero dei dati in base alla dimensione del dataset
     num_people=people*p//100
     num_cells=cells*p//100
     num_calls=calls*p//100
+
+    #creazione delle chiamate
     calls_list=calls_generator(calls,people_list[:num_people+1],cells_list[:num_cells+1])
+
+    #scrittura su file
     write_on_file("people",people_list[:num_people+1],header_people,p)
     write_on_file("cells",cells_list[:num_cells+1],header_cells,p)
     write_on_file("calls",calls_list[:num_calls+1],header_calls,p)

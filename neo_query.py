@@ -3,7 +3,7 @@ import csv
 import time
 import numpy as np
 
-
+#funzione per calcolare i tempi di confidenza
 def confidence(data):
     n = len(data)
     mean = np.mean(data)
@@ -17,8 +17,10 @@ def confidence(data):
     return (lower, upper)
 
 
+#definizione delle percentuali del dataset
 percentage = [25, 50, 75, 100]
 
+#lista delle query
 query = [
        "MATCH (p:person)  \
         WHERE p.first_name='Laura'\
@@ -43,37 +45,42 @@ query = [
         RETURN p1,c1,r1,r2,c2,p2,r3"
     ]
 
+#apertura del file csv e creazione dell'oggetto writer
 result_csv = open("csv/result_neo.csv", "w", newline='')
 writer_result = csv.writer(result_csv)
+
+#creazione degli headers e scrittura di questi
 headers = ['Query', 'Dimensione', 'Tempo prima esecuzione', 'Tempo delle 40 esecuzioni','Tempo medio', 'Intervallo di confidenza sup', 'Intervallo di confidenza inf']
 writer_result.writerow(headers)
 
 for j in range(1, len(query)+1):
     for p in percentage:
         results = ["Query"+str(j), str(p)+"%"]
+        #connessione al database
         graph = Graph("neo4j://127.0.0.1:7688", name="progetto"+str(p))
         
+        #prima esecuzione della query
         start = time.time()
         graph.run(query[j-1])
         end = (time.time() - start) * 1000
         results.append(end)
-        print("prima exe"+" Query"+str(j))
 
         data = []
+        #40 esecuzioni della query
         for i in range(40):
-            start30 = time.time()
+            start40 = time.time()
             query_res = graph.run(query[j-1])
-            end30 = (time.time() - start30) * 1000
-            data.append(end30)
+            end40 = (time.time() - start40) * 1000
+            data.append(end40)
         results.append(sum(data))
-        print("30 exe")
 
+        #calcolo del tempo medio
         avg = results[3]/40
         results.append(avg)
-        print("avg")
 
+        #calcolo degli intervalli di confidenza
         confidence_lvl = confidence(data)
-        print(confidence_lvl)
         results.append(confidence_lvl)
 
+        #scrittura dei risultati nel file csv
         writer_result.writerow(results)

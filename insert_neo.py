@@ -2,6 +2,7 @@ from py2neo import Graph, Relationship, Node
 from csv import DictReader
 
 def add_relationship(nodo1, type, nodo2):
+    #creazione della relazione
     relationship = Relationship(nodo1, type, nodo2)
     graph.create(relationship)
 
@@ -41,10 +42,12 @@ def create_nodes_from_csv(people_csv,cells_csv,calls_csv):
         for i in range(len(queries)):
             results.append(graph.run(queries[i]))
 
+        #recupero dell'oggetto nodo risultante dalle query
         chiamante = results[0].evaluate()
         chiamato = results[1].evaluate()
         cella = results[2].evaluate()
 
+        #creazione delle relazioni con il nodo chiamata
         add_relationship(node, "IS_CALLED", chiamato)
         add_relationship(chiamante, "IS_CALLING", node)
         add_relationship(node, "IS_DONE", cella)
@@ -62,4 +65,5 @@ for p in percentage:
     cells_csv = DictReader(open("csv/cells"+str(p)+".csv"))
     calls_csv = DictReader(open("csv/calls"+str(p)+".csv"))
 
+    #creazione dei nodi
     create_nodes_from_csv(people_csv, cells_csv, calls_csv)
